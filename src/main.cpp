@@ -52,8 +52,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
                                  hwnd, NULL, NULL, NULL);
 
             hFont = CreateFont(
-                24,0,0,0,
-                FW_MEDIUM,TRUE,FALSE,FALSE,
+                40,0,0,0,
+                FW_MEDIUM,FALSE,FALSE,FALSE,
                 FALSE,OUT_DEFAULT_PRECIS,
                 CLIP_DEFAULT_PRECIS,
                 DEFAULT_QUALITY,
