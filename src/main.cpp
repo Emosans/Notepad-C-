@@ -31,12 +31,7 @@ void addMenus(HWND hwnd){
     AppendMenu(hFileSubMenu, MF_STRING, 7, "Exit");
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hFileSubMenu, "File");
 
-    AppendMenu(hMenu, MF_STRING, 2, "Edit");
-
-    hBrush = CreateSolidBrush(RGB(0,0,0));
-    HDC hdc = (HDC)hBrush; //handle device context
-    SetTextColor(hdc,RGB(255,255,255)); //set text color to black
-    SetBkColor(hdc,RGB(0,0,0)); //set background color to light blue 
+    AppendMenu(hMenu, MF_STRING, 2, "Edit"); 
     //set menu to window
     SetMenu(hwnd,hMenu); //sets the menu to the window
 }
@@ -48,7 +43,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
         case WM_CREATE: {
             hEdit = CreateWindow("EDIT", "", 
                                  WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL,
-                                 0, 0, 885, 885, 
+                                 0, 0,1185, 885, 
                                  hwnd, NULL, NULL, NULL);
 
             hFont = CreateFont(
@@ -61,19 +56,26 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
                 "Segoe UI"
             );
 
-
+            hBrush = CreateSolidBrush(RGB(0,0,0));
             //create a new font {size,width,escapement,orientation,weight,italic,underline,strikeout,charset,outprecision,clipprecision,quality,pitchandfamily,fontname}
             SendMessage(hEdit,WM_SETFONT,(WPARAM)hFont,TRUE);
 
-            hBrush = CreateSolidBrush(RGB(0,0,0)); //crete brush with light blue color
             break;
         }
 
+        case WM_ERASEBKGND: {
+            HDC hdc = (HDC)wParam;
+            GetClientRect(hwnd, &rect);
+            FillRect(hdc, &rect, hBrush);  // Fill the entire window with gray
+            return 1;  // Indicate the background has been erased
+        }
+
+        case WM_CTLCOLORSTATIC:
         case WM_CTLCOLOREDIT: {
-            HDC hdc = (HDC)wParam; //handle device context
-            SetTextColor(hdc,RGB(255,255,255)); //set text color to black
-            SetBkColor(hdc,RGB(0,0,0)); //set background color to light blue
-            return (INT_PTR)hBrush; //return the brush to paint the background
+            HDC hdcStatic = (HDC)wParam;
+            SetTextColor(hdcStatic, RGB(255, 255, 255));
+            SetBkColor(hdcStatic, RGB(0,0,0));  // Set the background color of the edit control
+            return (INT_PTR)hBrush;
         }
 
         case WM_SIZE: {
@@ -165,14 +167,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     windowClass.hInstance = hInstance;
     windowClass.hCursor = LoadCursor(NULL,IDC_HAND);
-    windowClass.hbrBackground = CreateSolidBrush(RGB(0,0,0));
     windowClass.lpszClassName = L"WindowClass";
     windowClass.lpfnWndProc = WindowProc; //sets the window procedure to the WindowProc function
 
     if(!RegisterClassW(&windowClass)){ //registers the window class
         return -1;
     }
-    hwnd =CreateWindowW(L"WindowClass",L"My Window",WS_OVERLAPPEDWINDOW|WS_VISIBLE,100,100,900,900,NULL,NULL,NULL,NULL);
+    hwnd =CreateWindowW(L"WindowClass",L"Notepad",WS_OVERLAPPEDWINDOW|WS_VISIBLE,100,100,1200,900,NULL,NULL,NULL,NULL);
     addMenus(hwnd);
 
     MSG msg = {0};
